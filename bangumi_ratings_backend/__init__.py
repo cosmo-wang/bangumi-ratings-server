@@ -1,0 +1,1 @@
+default_app_config = "bangumi_ratings_backend.apps.BangumiRatingsServerConfig"

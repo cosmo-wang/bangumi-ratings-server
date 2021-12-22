@@ -1,0 +1,6 @@
+Django==3.2.10
+django-cors-headers
+graphene
+mysqlclient
+graphene-django
+graphene-federation

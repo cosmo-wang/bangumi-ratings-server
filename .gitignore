@@ -1,0 +1,5 @@
+mysql/
+__pycache__/
+bangumi_ratings_server/static/
+.pyc
+.DS_Store

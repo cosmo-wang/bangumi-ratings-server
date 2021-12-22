@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    platform: linux/x86_64
+    image: 'mysql:8.0'
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_HOST=localhost
+      - MYSQL_PORT=3306
+      - MYSQL_ROOT_HOST='%'
+      - MYSQL_DATABASE=dbname
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pass
+      - MYSQL_ROOT_PASSWORD=pass
+    restart: always
+  bangumi-ratings-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/bangumi-ratings-server
+    ports:
+      - '8080:8000'
+    depends_on:
+      - db
+    cap_add:
+      - ALL
+    restart: always
+    entrypoint: sh -c "./wait_for_database.py && python3 manage.py migrate --run-syncdb && python3 manage.py collectstatic --noinput && ./create_super_user.sh && python3 -u manage.py runserver 0.0.0.0:8000"
