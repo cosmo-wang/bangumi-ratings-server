@@ -15,13 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from graphene_django.views import GraphQLView
 
 from bangumi_ratings_backend.admin import admin_site
 
+def health_check_view(request):
+    return HttpResponse("OK")
+
 urlpatterns = [
+    path('health_check', health_check_view),
     path('admin/', admin.site.urls),
     path('bangumi-ratings-server-admin/', admin_site.urls),
     path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True))),
