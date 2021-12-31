@@ -1,27 +1,21 @@
 import graphene
 from graphene_django import DjangoObjectType
-from bangumi_ratings_backend.models import Anime, AnimeRating, SeasonAnimes, SeasonRanking, Quote
+from django.db.models import Max
+from bangumi_ratings_backend.models import Anime, SeasonAnime, SeasonRanking, Quote
+from bangumi_ratings_backend.queries.queries import AnimeNode
 import json
 import datetime
 
-class AnimeNode(DjangoObjectType):
+class SeasonAnimeNode(DjangoObjectType):
   class Meta:
-    model = Anime
-
-class AnimeRatingNode(DjangoObjectType):
-  class Meta:
-    model = AnimeRating
-
-class SeasonAnimesNode(DjangoObjectType):
-  class Meta:
-    model = SeasonAnimes
+    model = SeasonAnime
 
 class SeasonRankingNode(DjangoObjectType):
   class Meta:
     model = SeasonRanking
 
 class UpdateOrAddAnimeInput(graphene.InputObjectType):
-  id = graphene.Int()
+  anime_id = graphene.Int()
   name_zh = graphene.String()
   name_jp = graphene.String()
   douban_rating = graphene.Float()
@@ -41,7 +35,7 @@ class UpdateOrAddAnimeInput(graphene.InputObjectType):
   passion = graphene.Float()
 
 class UpdateOrAddSeasonAnimeInput(graphene.InputObjectType):
-  id = graphene.Int()
+  anime_id = graphene.Int()
   name_zh = graphene.String()
   name_jp = graphene.String()
   season = graphene.String()
@@ -52,7 +46,7 @@ class UpdateOrAddSeasonAnimeInput(graphene.InputObjectType):
   tv_episodes = graphene.Int()
   description = graphene.String()
 
-class UpdateRankingInput(graphene.InputObjectType):
+class UpdateRankingsInput(graphene.InputObjectType):
   season = graphene.String(required=True)
   rankings = graphene.List(graphene.String)
 
@@ -61,69 +55,58 @@ class UpdateOrAddAnime(graphene.Mutation):
     new_data = UpdateOrAddAnimeInput(required=True)
 
   anime = graphene.Field(AnimeNode)
-  anime_rating = graphene.Field(AnimeRatingNode)
 
   def mutate(root, info, new_data):
-    anime_defaults = {}
-    rating_defaults = {}
-    for field_name, value in new_data.items():
-      if field_name == 'story' or field_name == 'illustration' or field_name == 'music' or field_name == 'passion':
-        rating_defaults[field_name] = value
-      else:
-        anime_defaults[field_name] = value
-    if not 'id' in anime_defaults:
+    if not 'anime_id' in new_data:
       updated_anime, created = Anime.objects.update_or_create(
         name_zh=new_data.name_zh,
-        defaults=anime_defaults
+        defaults=new_data
       )
     else:
       updated_anime, created = Anime.objects.update_or_create(
-        id=new_data.id,
-        defaults=anime_defaults
+        id=new_data.anime_id,
+        defaults=new_data
       )
-    updated_rating, created = AnimeRating.objects.update_or_create(
-      anime_id=updated_anime.id,
-      defaults=rating_defaults
-    )
-    return UpdateOrAddAnime(anime=updated_anime, anime_rating=updated_rating)
+    return UpdateOrAddAnime(anime=updated_anime)
 
 class UpdateOrAddSeasonAnime(graphene.Mutation):
   class Arguments:
     new_data = UpdateOrAddSeasonAnimeInput(required=True)
 
   anime = graphene.Field(AnimeNode)
-  season_anime = graphene.Field(SeasonAnimesNode)
+  season_anime = graphene.Field(SeasonAnimeNode)
   season_ranking = graphene.Field(SeasonRankingNode)
 
   def mutate(root, info, new_data):
     anime_defaults = {}
     season_anime_defaults = {}
     for field_name, value in new_data.items():
-      if field_name == 'season':
+      if field_name == 'season' and value:
         anime_defaults['year'] = value.split('年')[0]
-      if field_name == 'release_date':
+      if field_name == 'release_date' and value:
         anime_defaults['year'] = value.year
+        anime_defaults['start_date'] = value
       if field_name == 'season' or field_name == 'release_date' or field_name == 'broadcast_day':
         season_anime_defaults[field_name] = value
       else:
         anime_defaults[field_name] = value
-    if not 'id' in anime_defaults:
+    if not 'anime_id' in anime_defaults:
       updated_anime, anime_created = Anime.objects.update_or_create(
         name_zh=new_data.name_zh,
         defaults=anime_defaults
       )
     else:
       updated_anime, anime_created = Anime.objects.update_or_create(
-        id=new_data.id,
+        id=new_data.anime_id,
         defaults=anime_defaults
       )
-    updated_season_anime, season_anime_created = SeasonAnimes.objects.update_or_create(
+    updated_season_anime, season_anime_created = SeasonAnime.objects.update_or_create(
       anime_id=updated_anime.id,
       defaults=season_anime_defaults
     )
     created_ranking = None
     if season_anime_created:
-      new_ranking = SeasonRanking.objects.filter(season=new_data.season).count() + 1
+      new_ranking = SeasonRanking.objects.filter(season=new_data.season).values('anime_id').distinct().count() + 1
       created_ranking = SeasonRanking.objects.create(
         anime_id=updated_anime.id,
         season=new_data.season,
@@ -134,7 +117,7 @@ class UpdateOrAddSeasonAnime(graphene.Mutation):
 
 class UpdateRankings(graphene.Mutation):
   class Arguments:
-    new_rankings = UpdateRankingInput(required=True)
+    new_rankings = UpdateRankingsInput(required=True)
 
   season_rankings = graphene.List(SeasonRankingNode)
 
@@ -143,22 +126,25 @@ class UpdateRankings(graphene.Mutation):
     created_rankings = []
     for idx, name_zh in enumerate(new_rankings.rankings):
       anime_id = Anime.objects.get(name_zh=name_zh).id
-      created_rankings.append(SeasonRanking.objects.create(
+      updated_ranking, created_ranking = SeasonRanking.objects.update_or_create(
         anime_id=anime_id,
-        season=new_rankings.season,
         date=date,
-        ranking=idx + 1
-      ))
+        defaults={
+          'season': new_rankings.season,
+          'ranking': idx + 1
+        }
+      )
+      created_rankings.append(updated_ranking)
     return UpdateRankings(season_rankings=created_rankings)
 
 class DeleteAnime(graphene.Mutation):
   class Arguments:
-    id = graphene.Int()
+    anime_id = graphene.Int()
 
   deleted_anime_name_zh = graphene.String()
 
-  def mutate(root, info, id):
-    anime_to_delete = Anime.objects.get(id=id)
+  def mutate(root, info, anime_id):
+    anime_to_delete = Anime.objects.get(id=anime_id)
     name_zh_to_delete = anime_to_delete.name_zh
     anime_to_delete.delete()
     return DeleteAnime(deleted_anime_name_zh=name_zh_to_delete)

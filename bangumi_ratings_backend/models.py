@@ -14,22 +14,15 @@ class Anime(models.Model):
   start_date = models.DateField(blank=True, null=True)
   end_date = models.DateField(blank=True, null=True)
   times_watched = models.IntegerField(default=0)
-
-  def __str__(self):
-    return f'{self.name_zh}, {self.start_date}, {self.end_date}, {self.douban_rating}'
-
-class AnimeRating(models.Model):
-  anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
   story = models.FloatField(default=0)
   illustration = models.FloatField(default=0)
   music = models.FloatField(default=0)
   passion = models.FloatField(default=0)
 
   def __str__(self):
-    anime_name = Anime.objects.get(id = self.anime_id).name_zh
-    return f'{anime_name}, {self.story}, {self.illustration}, {self.music}, {self.passion}'
+    return f'{self.name_zh}, {self.start_date}, {self.end_date}, {self.douban_rating}'
 
-class SeasonAnimes(models.Model):
+class SeasonAnime(models.Model):
   anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
   season = models.CharField(max_length=255)
   release_date = models.DateField(blank=True, null=True)

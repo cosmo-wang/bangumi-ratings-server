@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from bangumi_ratings_backend.models import Anime, AnimeRating, SeasonAnimes, SeasonRanking, Quote
+from bangumi_ratings_backend.models import Anime, AnimeRating, SeasonAnime, SeasonRanking, Quote
 import json
 import datetime
 
@@ -70,7 +70,7 @@ def import_new_animes():
         print(f"Created: {anime.name_zh}")
       seasons = anime_data["season"].split("，")
       for season in seasons:
-        _, created = SeasonAnimes.objects.get_or_create(
+        _, created = SeasonAnime.objects.get_or_create(
           anime = anime_id,
           season = season,
           release_date = None if anime_data.get("start_date", "") == "" else anime_data.get("start_date", ""),
@@ -99,9 +99,13 @@ def cleanup_ratings():
     if anime.status == "在看" or anime.status == "想看":
       rating_obj.delete()
 
+def migrate_ratings():
+  for rating_obj in AnimeRating.objects.all():
+    Anime.objects.filter(id=rating_obj.anime_id).update(story=rating_obj.story, illustration=rating_obj.illustration, music=rating_obj.music, passion=rating_obj.passion)
+
 class Command(BaseCommand):
 
   def handle(self, *args, **options):
     print("Start")
-    import_rankings()
+    migrate_ratings()
     print("Done")

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bangumi_ratings_backend.models import Anime, AnimeRating, SeasonAnimes, SeasonRanking, Quote
+from bangumi_ratings_backend.models import Anime, SeasonAnime, SeasonRanking, Quote
 
 IGNORED_FIELDS = ['anime_id']
 
@@ -16,15 +16,13 @@ class AnimeAdmin(admin.ModelAdmin):
   list_filter = ['status', 'genre', 'year', 'times_watched']
   list_display = search_fields = ['id', 'name_zh'] + list_filter
 
-class AnimeRatingAdmin(admin.ModelAdmin):
-  list_display = search_fields = get_options_name(AnimeRating)
-  list_filter = ['anime_id']
-
-class SeasonAnimesAdmin(admin.ModelAdmin):
-  list_display = list_filter = search_fields = get_options_name(SeasonAnimes)
+class SeasonAnimeAdmin(admin.ModelAdmin):
+  list_display = list_filter = get_options_name(SeasonAnime)
+  search_fields = ['name_zh']
 
 class SeasonRankingAdmin(admin.ModelAdmin):
   list_display = search_fields = get_options_name(SeasonRanking)
+  search_fields = ['anime_id']
   list_filter = ['season', 'date']
 
 class QuoteAdmin(admin.ModelAdmin):
@@ -32,7 +30,6 @@ class QuoteAdmin(admin.ModelAdmin):
 
 admin_site = BangumiRatingsServerAdminSite(name="bangumi-ratings-server-admin")
 admin_site.register(Anime, AnimeAdmin)
-admin_site.register(AnimeRating, AnimeRatingAdmin)
-admin_site.register(SeasonAnimes, SeasonAnimesAdmin)
+admin_site.register(SeasonAnime, SeasonAnimeAdmin)
 admin_site.register(SeasonRanking, SeasonRankingAdmin)
 admin_site.register(Quote, QuoteAdmin)
