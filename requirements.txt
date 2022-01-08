@@ -6,3 +6,4 @@ graphene-django
 graphene-federation
 python-dotenv
 uwsgi
+urllib3

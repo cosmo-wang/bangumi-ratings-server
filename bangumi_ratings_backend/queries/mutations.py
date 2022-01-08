@@ -19,6 +19,7 @@ class UpdateOrAddAnimeInput(graphene.InputObjectType):
   name_zh = graphene.String()
   name_jp = graphene.String()
   douban_rating = graphene.Float()
+  douban_link = graphene.String()
   year = graphene.String()
   status = graphene.String()
   genre = graphene.String()

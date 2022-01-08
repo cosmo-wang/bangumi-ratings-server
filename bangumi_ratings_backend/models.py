@@ -10,6 +10,7 @@ class Anime(models.Model):
   genre = models.CharField(max_length=255)
   year = models.CharField(max_length=10, blank=True)
   douban_rating = models.FloatField(default=0, blank=True)
+  douban_link = models.URLField(max_length=255, blank=True)
   description = models.TextField(default='', blank=True)
   start_date = models.DateField(blank=True, null=True)
   end_date = models.DateField(blank=True, null=True)
