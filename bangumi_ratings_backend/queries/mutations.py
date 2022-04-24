@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.db.models import Max
-from bangumi_ratings_backend.models import Anime, SeasonAnime, SeasonRanking, Quote
+from bangumi_ratings_backend.models import Anime, SeasonAnime, SeasonRanking
 from bangumi_ratings_backend.queries.queries import AnimeNode
 import json
 import datetime

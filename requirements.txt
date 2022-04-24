@@ -7,3 +7,4 @@ graphene-federation
 python-dotenv
 uwsgi
 urllib3
+beautifulsoup4
