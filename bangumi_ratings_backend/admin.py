@@ -1,5 +1,9 @@
 from django.contrib import admin
+<<<<<<< Updated upstream
 from bangumi_ratings_backend.models import Anime, SeasonAnime, SeasonRanking, Quote
+=======
+from bangumi_ratings_backend.models import Anime, SeasonAnimes, SeasonRanking, Game
+>>>>>>> Stashed changes
 
 IGNORED_FIELDS = ['anime_id']
 
