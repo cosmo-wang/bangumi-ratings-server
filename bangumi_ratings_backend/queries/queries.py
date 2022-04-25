@@ -1,4 +1,4 @@
-from graphene import Field, ObjectType, List, String, Int, Float, JSONString, Enum
+from graphene import Field, ObjectType, List, String, Int, Float, JSONString
 from graphene_django import DjangoObjectType
 from bangumi_ratings_backend.models import Anime, SeasonRanking
 from bangumi_ratings_backend.utils.scrape_data import *

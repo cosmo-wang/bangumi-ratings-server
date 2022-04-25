@@ -11,10 +11,13 @@ bangumi_tv_base_url = 'http://bangumi.tv'
 bangumi_tv_type_map = {
   'subject_type_1': '[书籍]',
   'subject_type_2': '[动漫]',
-  'subject_type_4': '[游戏]'
+  'subject_type_3': '[音乐]',
+  'subject_type_4': '[游戏]',
+  'subject_type_6': '[三次元]'
 }
 
 douban_search_url = 'https://www.douban.com/search?q={}'
+douban_url_pattern = '.*url=(?P<url>[^&]+)&.*'
 
 dmhy_search_url = 'http://www.dmhy.org/topics/list?keyword={}'
 dmhy_base_url = 'http://www.dmhy.org'
@@ -59,7 +62,8 @@ def douban_search(search_term):
     for res_element in all_res_list:
       name = res_element.a.text
       type = res_element.span.text
-      url = http_pool.request('GET', res_element.a['href']).geturl()
+      url_match = re.match(douban_url_pattern, res_element.a['href'])
+      url = url_match.group('url').replace('%3A', ':').replace('%2F', '/')
       res_list.append({'name': name, 'type': type, 'url': url})
     return res_list
   else:
