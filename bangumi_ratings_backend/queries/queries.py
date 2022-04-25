@@ -7,7 +7,7 @@ import json
 class AnimeNode(DjangoObjectType):
   class Meta:
     model = Anime
-    fields = ('name_zh', 'name_jp', 'tv_episodes', \
+    fields = ('name_zh', 'name_jp', 'cover_url', 'tv_episodes', \
               'movies', 'episode_length', 'genre', \
               'year', 'douban_rating', 'bangumi_tv_rating', \
               'douban_link', 'bangumi_tv_link', 'description', \
@@ -44,6 +44,7 @@ class DoubanInfoNode(ObjectType):
 class ScrapeResultNode(ObjectType):
   name_zh = String()
   name_jp = String()
+  cover_url = String()
   tv_episodes = Int()
   episode_length = Int()
   douban_rating = Float()

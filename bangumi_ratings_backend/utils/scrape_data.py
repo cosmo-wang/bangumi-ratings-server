@@ -9,9 +9,9 @@ search_res_max = 5
 bangumi_tv_search_url = 'http://bangumi.tv/subject_search/{}?cat=all'
 bangumi_tv_base_url = 'http://bangumi.tv'
 bangumi_tv_type_map = {
-  'subject_type_1': '书籍',
-  'subject_type_2': '动漫',
-  'subject_type_4': '游戏'
+  'subject_type_1': '[书籍]',
+  'subject_type_2': '[动漫]',
+  'subject_type_4': '[游戏]'
 }
 
 douban_search_url = 'https://www.douban.com/search?q={}'
@@ -72,6 +72,7 @@ def get_anime_info(bangumi_tv_url, douban_url):
   soup = BeautifulSoup(bangumi_tv_source, 'html.parser')
   name_zh = soup.select("#infobox li:contains(中文名)")[0].find(text=True, recursive=False)
   name_jp = soup.select("h1.nameSingle a")[0].text
+  cover_url = 'https:' + soup.select("a.cover")[0]['href']
   tv_episodes = soup.select("#infobox li:contains(话数)")[0].find(text=True, recursive=False)
   episode_length = soup.select("#infobox li:contains(话数)")[0].find(text=True, recursive=False)
   bangumi_tv_rating = soup.select(".global_score .number")[0].find(text=True, recursive=False)
@@ -79,6 +80,8 @@ def get_anime_info(bangumi_tv_url, douban_url):
   genre = ','.join([genre_element.text for genre_element in genre_elements])
   release_date = soup.select("#infobox li:contains(放送开始)")[0].find(text=True, recursive=False)
   date_match = re.match(zh_date_pattern, release_date)
+  release_date = datetime(int(date_match.group('year')), int(date_match.group('month')), int(date_match.group('day')))
+  release_date = release_date.strftime('%Y-%m-%d')
   year = date_match.group('year')
   season = date_match.group('year') + "年" + date_match.group('month') + "月"
   broadcast_day = soup.select("#infobox li:contains(放送星期)")[0].find(text=True, recursive=False)
@@ -98,6 +101,7 @@ def get_anime_info(bangumi_tv_url, douban_url):
   return {
     'name_zh': name_zh,
     'name_jp': name_jp,
+    'cover_url': cover_url,
     'tv_episodes': tv_episodes,
     'episode_length': episode_length,
     'bangumi_tv_rating': bangumi_tv_rating,

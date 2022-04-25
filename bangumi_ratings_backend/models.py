@@ -4,6 +4,7 @@ class Anime(models.Model):
   # basic info
   name_zh = models.CharField(unique=True, max_length=255)
   name_jp = models.CharField(max_length=255, blank=True)
+  cover_url = models.URLField(max_length=255, blank=True)
   tv_episodes = models.IntegerField(default=12)
   movies = models.IntegerField(default=0)
   episode_length = models.IntegerField(default=24)
