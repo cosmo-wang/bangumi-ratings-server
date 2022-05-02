@@ -4,9 +4,9 @@ import re
 from bangumi_ratings_backend.models import Anime
 from bs4 import BeautifulSoup
 
-search_res_max = 5
+search_res_max = 10
 
-bangumi_tv_search_url = 'http://bangumi.tv/subject_search/{}?cat=all'
+bangumi_tv_search_url = 'http://bangumi.tv/subject_search/{}?cat=2'
 bangumi_tv_base_url = 'http://bangumi.tv'
 bangumi_tv_type_map = {
   'subject_type_1': '[书籍]',
