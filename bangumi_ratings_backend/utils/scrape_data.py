@@ -61,7 +61,8 @@ def douban_search(search_term):
     res_list = []
     for res_element in all_res_list:
       name = res_element.a.text
-      type = res_element.span.text
+      type_element = res_element.span
+      type = type_element.text if type_element else ""
       url_match = re.match(douban_url_pattern, res_element.a['href'])
       url = url_match.group('url').replace('%3A', ':').replace('%2F', '/')
       res_list.append({'name': name, 'type': type, 'url': url})
@@ -70,15 +71,18 @@ def douban_search(search_term):
     return []
 
 def get_anime_info(bangumi_tv_url, douban_url):
+  def get_text_by_css_or_default(soup, selector, default):
+    elements = soup.select(selector)
+    return elements[0].find(text=True, recursive=False) if elements else default
+
   http_pool = urllib3.PoolManager()
   # get info from bangumi TV
   bangumi_tv_source = http_pool.request('GET', bangumi_tv_url).data.decode('utf-8')
   soup = BeautifulSoup(bangumi_tv_source, 'html.parser')
-  name_zh = soup.select("#infobox li:contains(中文名)")[0].find(text=True, recursive=False)
   name_jp = soup.select("h1.nameSingle a")[0].text
+  name_zh = get_text_by_css_or_default(soup, "#infobox li:contains(中文名)", name_jp)
   cover_url = 'https:' + soup.select("a.cover")[0]['href']
-  tv_episodes = soup.select("#infobox li:contains(话数)")[0].find(text=True, recursive=False)
-  episode_length = soup.select("#infobox li:contains(话数)")[0].find(text=True, recursive=False)
+  tv_episodes = get_text_by_css_or_default(soup, "#infobox li:contains(话数)", 12)
   bangumi_tv_rating = soup.select(".global_score .number")[0].find(text=True, recursive=False)
   genre_elements = soup.select(".subject_tag_section .inner span")
   genre = ','.join([genre_element.text for genre_element in genre_elements])
@@ -101,6 +105,8 @@ def get_anime_info(bangumi_tv_url, douban_url):
   else:
     episode_length = 24
   douban_rating = soup.select('strong.rating_num')[0].text
+  if not douban_rating:
+    douban_rating = 0
 
   return {
     'name_zh': name_zh,
