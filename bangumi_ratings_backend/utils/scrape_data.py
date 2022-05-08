@@ -24,6 +24,16 @@ dmhy_base_url = 'http://www.dmhy.org'
 
 zh_date_pattern = '(?P<year>\d+)年(?P<month>\d+)月(?P<day>\d+)日'
 
+weekday_map = {
+  1: '星期一',
+  2: '星期二',
+  3: '星期三',
+  4: '星期四',
+  5: '星期五',
+  6: '星期六',
+  7: '星期日'
+}
+
 def bangumi_tv_search(search_term):
   http_pool = urllib3.PoolManager()
   html_source = http_pool.request('GET', bangumi_tv_search_url.format(search_term)).data.decode('utf-8')
@@ -89,10 +99,10 @@ def get_anime_info(bangumi_tv_url, douban_url):
   release_date = soup.select("#infobox li:contains(放送开始)")[0].find(text=True, recursive=False)
   date_match = re.match(zh_date_pattern, release_date)
   release_date = datetime(int(date_match.group('year')), int(date_match.group('month')), int(date_match.group('day')))
+  broadcast_day = get_text_by_css_or_default(soup, "#infobox li:contains(放送星期)", weekday_map[release_date.isoweekday()])
   release_date = release_date.strftime('%Y-%m-%d')
   year = date_match.group('year')
   season = date_match.group('year') + "年" + date_match.group('month') + "月"
-  broadcast_day = soup.select("#infobox li:contains(放送星期)")[0].find(text=True, recursive=False)
   description = soup.select('#subject_summary')[0].text
 
   # get info from douban
