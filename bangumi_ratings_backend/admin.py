@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bangumi_ratings_backend.models import Anime, SeasonAnime, SeasonRanking
+from bangumi_ratings_backend.models import Anime, SeasonRanking
 
 IGNORED_FIELDS = ['anime_id']
 
@@ -16,10 +16,6 @@ class AnimeAdmin(admin.ModelAdmin):
   list_filter = ['status', 'genre', 'year', 'times_watched', 'season']
   list_display = search_fields = ['id', 'name_zh'] + list_filter
 
-class SeasonAnimeAdmin(admin.ModelAdmin):
-  list_display = list_filter = get_options_name(SeasonAnime)
-  search_fields = ['name_zh']
-
 class SeasonRankingAdmin(admin.ModelAdmin):
   list_display = search_fields = get_options_name(SeasonRanking)
   search_fields = ['anime_id']
@@ -28,5 +24,4 @@ class SeasonRankingAdmin(admin.ModelAdmin):
 
 admin_site = BangumiRatingsServerAdminSite(name="bangumi-ratings-server-admin")
 admin_site.register(Anime, AnimeAdmin)
-admin_site.register(SeasonAnime, SeasonAnimeAdmin)
 admin_site.register(SeasonRanking, SeasonRankingAdmin)
