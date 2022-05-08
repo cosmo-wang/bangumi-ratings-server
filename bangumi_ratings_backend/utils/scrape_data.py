@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 search_res_max = 10
 
-bangumi_tv_search_url = 'http://bangumi.tv/subject_search/{}?cat=2'
+bangumi_tv_search_url = 'http://bangumi.tv/subject_search/{}?cat=all'
 bangumi_tv_base_url = 'http://bangumi.tv'
 bangumi_tv_type_map = {
   'subject_type_1': '[书籍]',
@@ -15,9 +15,6 @@ bangumi_tv_type_map = {
   'subject_type_4': '[游戏]',
   'subject_type_6': '[三次元]'
 }
-
-douban_search_url = 'https://www.douban.com/search?q={}'
-douban_url_pattern = '.*url=(?P<url>[^&]+)&.*'
 
 dmhy_search_url = 'http://www.dmhy.org/topics/list?keyword={}'
 dmhy_base_url = 'http://www.dmhy.org'
@@ -60,27 +57,8 @@ def bangumi_tv_search(search_term):
     return res_list
   else:
     return []
-  
-def douban_search(search_term):
-  http_pool = urllib3.PoolManager()
-  html_source = http_pool.request('GET', douban_search_url.format(search_term)).data.decode('utf-8')
-  soup = BeautifulSoup(html_source, 'html.parser')
-  all_res_list = soup.select('.result-list .result h3')
-  if all_res_list:
-    all_res_list = all_res_list[:min(len(all_res_list), search_res_max)]
-    res_list = []
-    for res_element in all_res_list:
-      name = res_element.a.text
-      type_element = res_element.span
-      type = type_element.text if type_element else ""
-      url_match = re.match(douban_url_pattern, res_element.a['href'])
-      url = url_match.group('url').replace('%3A', ':').replace('%2F', '/')
-      res_list.append({'name': name, 'type': type, 'url': url})
-    return res_list
-  else:
-    return []
 
-def get_anime_info(bangumi_tv_url, douban_url):
+def get_anime_info(bangumi_tv_url):
   def get_text_by_css_or_default(soup, selector, default):
     elements = soup.select(selector)
     return elements[0].find(text=True, recursive=False) if elements else default
@@ -105,31 +83,15 @@ def get_anime_info(bangumi_tv_url, douban_url):
   season = date_match.group('year') + "年" + date_match.group('month') + "月"
   description = soup.select('#subject_summary')[0].text
 
-  # get info from douban
-  douban_source = http_pool.request('GET', douban_url).data.decode('utf-8')
-  soup = BeautifulSoup(douban_source, 'html.parser')
-  episode_length_search_res = re.search('单集片长:</span>.*\d分钟', douban_source)
-  if episode_length_search_res:
-    episode_length = episode_length_search_res.group().replace('单集片长:</span>', '').replace(' ', '')
-    episode_length = re.sub('分钟(<br.*)?', '', episode_length)
-  else:
-    episode_length = 24
-  douban_rating = soup.select('strong.rating_num')[0].text
-  if not douban_rating:
-    douban_rating = 0
-
   return {
     'name_zh': name_zh,
     'name_jp': name_jp,
     'cover_url': cover_url,
     'tv_episodes': tv_episodes,
-    'episode_length': episode_length,
     'bangumi_tv_rating': bangumi_tv_rating,
-    'douban_rating': douban_rating,
     'genre': genre,
     'year': year,
     'bangumi_tv_link': bangumi_tv_url,
-    'douban_link': douban_url,
     'season': season,
     'release_date': release_date,
     'broadcast_day': broadcast_day,
