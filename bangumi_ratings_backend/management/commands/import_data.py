@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from bangumi_ratings_backend.models import Anime, AnimeRating, SeasonAnime, SeasonRanking, Quote
+from bangumi_ratings_backend.models import Anime, AnimeRating, SeasonAnime, SeasonRanking
 import json
 import datetime
 
