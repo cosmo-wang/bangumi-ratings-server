@@ -40,12 +40,6 @@ class Anime(models.Model):
   def __str__(self):
     return f'{self.name_zh}, {self.start_date}, {self.end_date}, {self.douban_rating}'
 
-class SeasonAnime(models.Model):
-  anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
-  season = models.CharField(max_length=255)
-  release_date = models.DateField(blank=True, null=True)
-  broadcast_day = models.CharField(max_length=255, blank=True, null=True)
-
 class SeasonRanking(models.Model):
   anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
   season = models.CharField(max_length=255)

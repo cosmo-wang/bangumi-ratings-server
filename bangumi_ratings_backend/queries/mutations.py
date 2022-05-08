@@ -64,52 +64,6 @@ class AddAnime(Mutation):
     updated_anime = Anime.objects.create(**new_data)
     return AddAnime(anime=updated_anime)
 
-# class UpdateOrAddSeasonAnime(Mutation):
-#   class Arguments:
-#     new_data = UpdateOrAddSeasonAnimeInput(required=True)
-
-#   anime = Field(AnimeNode)
-#   season_anime = Field(SeasonAnimeNode)
-#   season_ranking = Field(SeasonRankingNode)
-
-#   def mutate(root, info, new_data):
-#     anime_defaults = {}
-#     season_anime_defaults = {}
-#     for field_name, value in new_data.items():
-#       if field_name == 'season' and value:
-#         anime_defaults['year'] = value.split('年')[0]
-#       if field_name == 'release_date' and value:
-#         anime_defaults['year'] = value.year
-#         anime_defaults['start_date'] = value
-#       if field_name == 'season' or field_name == 'release_date' or field_name == 'broadcast_day':
-#         season_anime_defaults[field_name] = value
-#       else:
-#         anime_defaults[field_name] = value
-#     if not 'anime_id' in anime_defaults:
-#       updated_anime, anime_created = Anime.objects.update_or_create(
-#         name_zh=new_data.name_zh,
-#         defaults=anime_defaults
-#       )
-#     else:
-#       updated_anime, anime_created = Anime.objects.update_or_create(
-#         id=new_data.anime_id,
-#         defaults=anime_defaults
-#       )
-#     updated_season_anime, season_anime_created = SeasonAnime.objects.update_or_create(
-#       anime_id=updated_anime.id,
-#       defaults=season_anime_defaults
-#     )
-#     created_ranking = None
-#     if season_anime_created:
-#       new_ranking = SeasonRanking.objects.filter(season=new_data.season).values('anime_id').distinct().count() + 1
-#       created_ranking = SeasonRanking.objects.create(
-#         anime_id=updated_anime.id,
-#         season=new_data.season,
-#         date=datetime.datetime.today(),
-#         ranking=new_ranking
-#       )
-#     return UpdateOrAddSeasonAnime(anime=updated_anime, season_anime=updated_season_anime, season_ranking=created_ranking)
-
 class UpdateRankings(Mutation):
   class Arguments:
     new_rankings = UpdateRankingsInput(required=True)
