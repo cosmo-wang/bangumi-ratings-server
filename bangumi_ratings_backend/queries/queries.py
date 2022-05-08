@@ -13,7 +13,8 @@ class AnimeNode(DjangoObjectType):
               'douban_link', 'bangumi_tv_link', 'description', \
               'season', 'release_date', 'broadcast_day', \
               'status', 'start_date', 'end_date', 'times_watched', \
-              'story', 'illustration', 'music', 'passion')
+              'story', 'illustration', 'music', 'passion', \
+              'dmhy_search_terms', 'dmhy_tags', 'delayed_weeks')
   
   id = Int()
   rankings = JSONString(season=String())

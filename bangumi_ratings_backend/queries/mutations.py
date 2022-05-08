@@ -36,6 +36,9 @@ class UpdateOrAddAnimeInput(InputObjectType):
   illustration = Float()
   music = Float()
   passion = Float()
+  dmhy_search_terms = String()
+  dmhy_tags = String()
+  delayed_weeks = Int()
 
 class UpdateRankingsInput(InputObjectType):
   season = String(required=True)
