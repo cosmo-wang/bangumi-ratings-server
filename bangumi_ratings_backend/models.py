@@ -10,9 +10,7 @@ class Anime(models.Model):
   episode_length = models.IntegerField(default=24)
   genre = models.CharField(max_length=255)  # seperated by /
   year = models.CharField(max_length=10, blank=True)
-  douban_rating = models.FloatField(default=0, blank=True)
   bangumi_tv_rating = models.FloatField(default=0, blank=True)
-  douban_link = models.URLField(max_length=255, blank=True)
   bangumi_tv_link = models.URLField(max_length=255, blank=True)
   description = models.TextField(default='', blank=True)
   season = models.CharField(max_length=255, default='')
@@ -38,7 +36,7 @@ class Anime(models.Model):
     super(Anime, self).save(*args, **kwargs)
 
   def __str__(self):
-    return f'{self.name_zh}, {self.start_date}, {self.end_date}, {self.douban_rating}'
+    return f'{self.name_zh}, {self.start_date}, {self.end_date}'
 
 class SeasonRanking(models.Model):
   anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
