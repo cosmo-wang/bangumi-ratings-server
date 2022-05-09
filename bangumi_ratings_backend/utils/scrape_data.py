@@ -67,7 +67,8 @@ def get_anime_info(bangumi_tv_url):
   # get info from bangumi TV
   bangumi_tv_source = http_pool.request('GET', bangumi_tv_url).data.decode('utf-8')
   soup = BeautifulSoup(bangumi_tv_source, 'html.parser')
-  name_jp = soup.select("h1.nameSingle a")[0].text
+  name_jp_elements = soup.select("h1.nameSingle a")
+  name_jp = name_jp_elements[0].text if name_jp_elements else ''
   name_zh = get_text_by_css_or_default(soup, "#infobox li:contains(中文名)", name_jp)
   cover_url = 'https:' + soup.select("a.cover")[0]['href']
   tv_episodes = get_text_by_css_or_default(soup, "#infobox li:contains(话数)", 12)
@@ -84,7 +85,8 @@ def get_anime_info(bangumi_tv_url):
   release_date = release_date.strftime('%Y-%m-%d')
   year = date_match.group('year')
   season = date_match.group('year') + "年" + date_match.group('month') + "月"
-  description = soup.select('#subject_summary')[0].text
+  description_elements = soup.select('#subject_summary')
+  description = description_elements[0].text if description_elements else ''
 
   return {
     'name_zh': name_zh,
