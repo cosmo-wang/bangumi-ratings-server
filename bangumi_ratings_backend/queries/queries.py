@@ -8,8 +8,8 @@ class AnimeNode(DjangoObjectType):
   class Meta:
     model = Anime
     fields = ('name_zh', 'name_jp', 'cover_url', 'tv_episodes', \
-              'movies', 'episode_length', 'genre', \
-              'year', 'bangumi_tv_rating', 'bangumi_tv_link', 'description', \
+              'episode_length', 'genre', 'year', \
+              'bangumi_tv_rating', 'bangumi_tv_link', 'description', \
               'season', 'release_date', 'broadcast_day', \
               'status', 'start_date', 'end_date', 'times_watched', \
               'story', 'illustration', 'music', 'passion', \

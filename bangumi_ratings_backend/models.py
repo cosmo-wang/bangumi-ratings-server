@@ -6,7 +6,6 @@ class Anime(models.Model):
   name_jp = models.CharField(max_length=255, blank=True)
   cover_url = models.URLField(max_length=255, blank=True)
   tv_episodes = models.IntegerField(default=12)
-  movies = models.IntegerField(default=0)
   episode_length = models.IntegerField(default=24)
   genre = models.CharField(max_length=255)  # seperated by /
   year = models.CharField(max_length=10, blank=True)

@@ -27,7 +27,6 @@ def health_check_view(request):
     return HttpResponse("OK")
 
 def authentication(request):
-    print(request.GET)
     user = authenticate(username=request.GET['username'], password=request.GET['password'])
     if user is not None:
         return HttpResponse("OK")
