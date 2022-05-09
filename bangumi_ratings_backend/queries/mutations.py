@@ -16,7 +16,6 @@ class UpdateOrAddAnimeInput(InputObjectType):
   name_jp = String()
   cover_url = String()
   tv_episodes = Int()
-  movies = Int()
   episode_length = Int()
   genre = String()
   year = String()
