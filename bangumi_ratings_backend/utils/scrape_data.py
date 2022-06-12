@@ -18,6 +18,8 @@ bangumi_tv_type_map = {
 
 dmhy_search_url = 'http://www.dmhy.org/topics/list?keyword={}'
 dmhy_base_url = 'http://www.dmhy.org'
+dmhy_paginate_url = 'http://www.dmhy.org/topics/list/page/{}'
+dmhy_search_max = 100
 
 zh_date_pattern = '(?P<year>\d+)年(?P<month>\d+)月(?P<day>\d+)日'
 
@@ -134,16 +136,14 @@ def dmhy_search_download_links(id):
   tag_not_found = True
   episode_not_found = True
   for search_term in search_terms:
-    search_result_page = http_pool.request('GET', dmhy_search_url.format(search_term.replace(' ', '+'))).data.decode('utf-8')
-    soup = BeautifulSoup(search_result_page, 'html.parser')
-    entries = soup.select('table.tablesorter tbody tr')
+    entries = search_on_dmhy(search_term)
     for entry in entries:
       a_tags = entry.find('td', {'class': 'title'}).find_all('a')
       if len(a_tags) > 1:
         title_element = entry.find('td', {'class': 'title'}).find_all('a')[1]
       else:
         title_element = entry.find('td', {'class': 'title'}).find_all('a')[0]
-      entry_name = title_element.text
+      entry_name = title_element.text.strip()
       if entry_name not in found_names:
         for tag in tags:
           if search_term_match(search_term, entry_name):
@@ -154,9 +154,11 @@ def dmhy_search_download_links(id):
                 found_names.add(entry_name)
                 episode_not_found = False
                 res = {}
+                res['time'] = entry.find_all('td')[0].find(text=True).strip()
                 res['name'] = entry_name
                 res['page_url'] = dmhy_base_url + title_element['href']
                 res['magnet_url'] = entry.find('a', {'title': '磁力下載'})['href']
+                res['size'] = entry.find_all('td')[4].text.strip()
                 res_list.append(res)
     msg = ''
     if search_term_not_found:
@@ -165,5 +167,38 @@ def dmhy_search_download_links(id):
       msg += f'未找到标签：{tags}相关条目。'
     elif episode_not_found:
       msg += f'未找到第{latest_episode}集相关条目。'
-  return {'res_list': res_list, 'msg': msg}
-  
+  return {'title': f'第{latest_episode}集搜索结果','res_list': res_list, 'msg': msg}
+
+def dmhy_search(search_term):
+  entries = search_on_dmhy(search_term)
+  res_list = []
+  found_names = set()
+  for entry in entries:
+    a_tags = entry.find('td', {'class': 'title'}).find_all('a')
+    if len(a_tags) > 1:
+      title_element = entry.find('td', {'class': 'title'}).find_all('a')[1]
+    else:
+      title_element = entry.find('td', {'class': 'title'}).find_all('a')[0]
+    entry_name = title_element.text
+    if entry_name not in found_names:
+      found_names.add(entry_name)
+      res = {}
+      res['time'] = entry.find_all('td')[0].find(text=True).strip() + ' GMT+8'
+      res['name'] = entry_name
+      res['page_url'] = dmhy_base_url + title_element['href']
+      res['magnet_url'] = entry.find('a', {'title': '磁力下載'})['href']
+      res['size'] = entry.find_all('td')[4].text
+      res_list.append(res)
+  return {'title': f'{search_term}搜索结果','res_list': res_list, 'msg': ''}
+
+
+def search_on_dmhy(search_term):
+  http_pool = urllib3.PoolManager()
+  search_result_page = http_pool.request('GET', dmhy_search_url.format(search_term.replace(' ', '+'))).data.decode('utf-8')
+  soup = BeautifulSoup(search_result_page, 'html.parser')
+  res = []
+  while (len(res) < dmhy_search_max):
+    cur_page_res = soup.select('table.tablesorter tbody tr')
+    if len(cur_page_res) == 0: break
+    res += cur_page_res
+  return res

@@ -52,11 +52,14 @@ class SearchResultNode(ObjectType):
   url = String()
 
 class DownloadLinkResult(ObjectType):
+  time = String()
   name = String()
   page_url = String()
   magnet_url = String()
+  size = String()
 
-class SearchDownloadLinkResultNode(ObjectType):
+class SearchDmhyResultNode(ObjectType):
+  title = String()
   res_list = List(DownloadLinkResult)
   msg = String()
 
@@ -64,7 +67,8 @@ class Query(ObjectType):
   get_animes = List(AnimeNode)
   search_bangumi_tv = List(SearchResultNode, search_term=String())
   get_anime_info = Field(ScrapeResultNode, bangumi_tv_url=String())
-  get_download_link = Field(SearchDownloadLinkResultNode, id=Int())
+  get_download_link = Field(SearchDmhyResultNode, id=Int())
+  search_dmhy = Field(SearchDmhyResultNode, search_term=String())
 
   def resolve_get_animes(self, info, **kwargs):
     return Anime.objects.all().order_by('-end_date')
@@ -77,4 +81,7 @@ class Query(ObjectType):
     return ScrapeResultNode(**scrape_res)
 
   def resolve_get_download_link(self, info, id):
-    return SearchDownloadLinkResultNode(**dmhy_search_download_links(id))
+    return SearchDmhyResultNode(**dmhy_search_download_links(id))
+
+  def resolve_search_dmhy(self, info, search_term):
+    return SearchDmhyResultNode(**dmhy_search(search_term))
