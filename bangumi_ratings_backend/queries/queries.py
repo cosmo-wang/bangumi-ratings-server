@@ -16,7 +16,7 @@ class AnimeNode(DjangoObjectType):
               'dmhy_search_terms', 'dmhy_tags', 'delayed_weeks')
   
   id = Int()
-  rankings = JSONString(season=String())
+  rankings = JSONString()
 
   def resolve_id(parent, info):
     return parent.id
