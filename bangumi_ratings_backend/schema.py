@@ -1,4 +1,3 @@
-import graphene
 from graphene import ObjectType
 from graphene_federation import build_schema
 from bangumi_ratings_backend.queries.queries import Query as queries
