@@ -62,7 +62,13 @@ def bangumi_tv_search(search_term):
 def get_anime_info(bangumi_tv_url):
   def get_text_by_css_or_default(soup, selector, default):
     elements = soup.select(selector)
-    return elements[0].find(text=True, recursive=False) if elements else default
+    if elements:
+      extracted_text = elements[0].find(text=True, recursive=False)
+      if isinstance(default, int) and (not extracted_text.isnumeric()):
+        return default
+      else:
+        return extracted_text
+    return default
 
   http_pool = urllib3.PoolManager()
   # get info from bangumi TV
