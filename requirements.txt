@@ -6,4 +6,4 @@ graphene-django==3.0.0b7
 mysqlclient==2.1.0
 python-dotenv==0.20.0
 urllib3==1.26.9
-pyuwsgi==2.0.20
+pyuwsgi==2.0.21
