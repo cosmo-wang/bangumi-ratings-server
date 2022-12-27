@@ -48,6 +48,7 @@ class UpdateAnime(Mutation):
   anime = Field(AnimeNode)
 
   def mutate(root, info, new_data):
+    print(new_data)
     updated_anime, created = Anime.objects.update_or_create(
       id=new_data.id,
       defaults=new_data
