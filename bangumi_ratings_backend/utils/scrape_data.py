@@ -79,7 +79,7 @@ def get_anime_info(bangumi_tv_url):
   name_zh = get_text_by_css_or_default(soup, "#infobox li:contains(中文名)", name_jp)
   cover_url = 'https:' + soup.select("a.cover")[0]['href']
   tv_episodes = get_text_by_css_or_default(soup, "#infobox li:contains(话数)", 12)
-  bangumi_tv_rating = get_text_by_css_or_default(soup, ".global_score .number", 0)
+  bangumi_tv_rating = get_text_by_css_or_default(soup, ".global_score .number", 0.0)
   genre_elements = soup.select(".subject_tag_section .inner span")
   genre = ','.join([genre_element.text for genre_element in genre_elements])
   release_date = get_text_by_css_or_default(soup, "#infobox li:contains(放送开始)", '')
