@@ -28,8 +28,15 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1']
 CORS_ORIGIN_ALLOW_ALL = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://www.bangumi-ratings.com',
+    'https://bangumi-ratings.com'
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -82,11 +89,11 @@ WSGI_APPLICATION = 'bangumi_ratings_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        "USER": os.environ.get('DATABASE_USER'),
-        "PASSWORD": os.environ.get('DATABASE_PASSWORD'),
-        "HOST": os.environ.get('DATABASE_HOST'),
-        "PORT": os.environ.get('DATABASE_PORT'),
+        'NAME': os.getenv('MYSQL_DATABASE', 'bangumi-ratings-db'),
+        'USER': os.getenv('MYSQL_USER', 'bangumi_backend'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'gSlVCGhFn1nfSHLl'),
+        'HOST': os.getenv('MYSQL_HOST', 'bangumi-ratings-db'), # Default to the container name
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
     }
 }
 
