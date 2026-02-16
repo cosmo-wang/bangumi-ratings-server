@@ -17,8 +17,6 @@ from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate
-
 from graphene_django.views import GraphQLView
 
 from bangumi_ratings_backend.admin import admin_site
@@ -26,17 +24,8 @@ from bangumi_ratings_backend.admin import admin_site
 def health_check_view(request):
     return HttpResponse("OK")
 
-def authentication(request):
-    user = authenticate(username=request.GET['username'], password=request.GET['password'])
-    if user is not None:
-        return HttpResponse("OK")
-    else:
-        return HttpResponse("Unauthorized", status=401)
-
-
 urlpatterns = [
     path('health_check', health_check_view),
-    path('authenticate', authentication),
     path('admin/', admin.site.urls),
     path('bangumi-ratings-server-admin/', admin_site.urls),
     path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True))),
